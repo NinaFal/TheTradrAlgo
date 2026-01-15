@@ -1022,7 +1022,7 @@ class LiveTradingBot:
         if today not in self.trading_days:
             self.trading_days.add(today)
             self._save_trading_days()
-            log.info(f"Recorded trading day: {today} (Total: {len(self.trading_days)}/{FIVEERS_CONFIG.min_trading_days} required)")
+            log.info(f"Recorded trading day: {today} (Total: {len(self.trading_days)}/{FIVEERS_CONFIG.min_profitable_days} required)")
     
     def check_trading_days_warning(self) -> bool:
         """
@@ -1037,13 +1037,13 @@ class LiveTradingBot:
         now = datetime.now(timezone.utc)
         days_remaining = (self.challenge_end_date - now).days
         trading_days_count = len(self.trading_days)
-        days_needed = FIVEERS_CONFIG.min_trading_days - trading_days_count
+        days_needed = FIVEERS_CONFIG.min_profitable_days - trading_days_count
         
         if days_needed <= 0:
             return False
         
         if days_remaining <= days_needed + 2:
-            log.warning(f"TRADING DAYS WARNING: {trading_days_count}/{FIVEERS_CONFIG.min_trading_days} days traded, "
+            log.warning(f"TRADING DAYS WARNING: {trading_days_count}/{FIVEERS_CONFIG.min_profitable_days} days traded, "
                        f"{days_remaining} days remaining in challenge. Need {days_needed} more trading days!")
             return True
         
@@ -1054,14 +1054,14 @@ class LiveTradingBot:
         from ftmo_config import FIVEERS_CONFIG
         
         trading_days_count = len(self.trading_days)
-        days_needed = max(0, FIVEERS_CONFIG.min_trading_days - trading_days_count)
+        days_needed = max(0, FIVEERS_CONFIG.min_profitable_days - trading_days_count)
         
         status = {
             "trading_days_count": trading_days_count,
-            "min_required": FIVEERS_CONFIG.min_trading_days,
+            "min_required": FIVEERS_CONFIG.min_profitable_days,
             "days_needed": days_needed,
             "trading_days": sorted(list(self.trading_days)),
-            "requirement_met": trading_days_count >= FIVEERS_CONFIG.min_trading_days,
+            "requirement_met": trading_days_count >= FIVEERS_CONFIG.min_profitable_days,
         }
         
         if self.challenge_end_date:
