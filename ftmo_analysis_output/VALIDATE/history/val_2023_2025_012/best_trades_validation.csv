@@ -1,2 +1,0 @@
-trade_id,symbol,direction,entry_date,exit_date,entry_price,exit_price,stop_loss,take_profit,result_r,profit_usd,win,confluence_score,quality_factors
-1,ETH_USD,bearish,2023-02-13 00:00:00+00:00,2023-02-16 00:00:00+00:00,1487.5810412597657,1703.326937177171,1703.326187177171,1358.1339537093224,-1.0,-360.0,0,15,0

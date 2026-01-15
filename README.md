@@ -1,191 +1,273 @@
-# 5ers 60K High Stakes Trading Bot
+# 🤖 Trading Bot Template - 5ERS Challenge Ready
 
-Automated MetaTrader 5 trading bot for **5ers 60K High Stakes** Challenge accounts. Uses a **3-TP Confluence System** with multi-timeframe analysis. Validated with **H1 Realistic Simulation** for production-ready results.
+**A customizable trading bot template for Forex optimization and live trading.**
 
-## 🎯 Final Validated Performance (January 6, 2026)
-
-### H1 Realistic Simulation Results
-*Simulates EXACTLY what `main_live_bot.py` would do in production*
-
-| Metric | Value |
-|--------|-------|
-| **Starting Balance** | $60,000 |
-| **Final Balance** | **$948,629** |
-| **Net Return** | **+1,481%** |
-| **Total Trades** | **943** |
-| **Win Rate** | **66.1%** |
-| **Max Total DD** | **2.17%** (limit 10%) ✅ |
-| **Max Daily DD** | **4.16%** (limit 5%) ✅ |
-| **DDD Halts** | 2 (safety working) |
-| **Commissions** | $9,391 |
-
-### Entry Queue System
-| Metric | Value |
-|--------|-------|
-| Proximity Threshold | 0.3R |
-| Signals Generated | ~2,000 |
-| Trades Executed | 943 (47% fill rate) |
-| Max Wait Time | 5 days |
-
-### 5ers Challenge Compliance
-| Rule | Limit | Achieved | Status |
-|------|-------|----------|--------|
-| Max TDD | 10% | 2.17% | ✅ |
-| Max DDD | 5% | 4.16% | ✅ |
-| Profit Target | 8% Step 1 | +1,481% | ✅ |
+> ⚠️ **TEMPLATE**: Dit is een educatieve template met een eenvoudige EMA/RSI/ADX strategie.
+> Je wordt aangemoedigd om je eigen strategie te ontwikkelen en de parameters te optimaliseren.
 
 ---
 
-## Quick Start
+## 🚀 Quick Start (Codespaces)
+
+### 1. Open in GitHub Codespaces
+Klik op de groene "Code" knop → "Codespaces" → "Create codespace on main"
+
+### 2. Installeer dependencies
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Run TPE Optimization
+```bash
+python optimizer.py --trials 50 --balance 100000 --start 2023-01-01 --end 2025-12-31
+```
+
+### 4. Valideer met H1 Simulator
+```bash
+python simulator.py --params optimization_output/best_params.json
+```
+
+---
+
+## 📁 Project Structuur
+
+```
+├── strategy_template.py    # 🎯 Jouw trading strategie (EMA/RSI/ADX)
+├── optimizer.py            # 🔧 TPE optimizer (Optuna) + 5ERS risk rules
+├── simulator.py            # 📊 H1 trade simulator + DDD tracking
+├── live_bot.py             # 🤖 Live trading bot (MT5) + prop firm safety
+├── data/ohlcv/             # 📈 Historische data (D1/H1)
+├── optimization_output/    # 💾 Optimizer resultaten
+└── simulation_output/      # 📊 Simulator resultaten
+```
+
+---
+
+## 🎯 De Template Strategie
+
+De meegeleverde strategie gebruikt een **5-Pillar Confluence System**:
+
+### Confluence Pillars:
+
+| # | Pillar | Bullish | Bearish |
+|---|--------|---------|---------|
+| 1 | 📈 **Trend Bias** | Price > SMA20 > SMA50 | Price < SMA20 < SMA50 |
+| 2 | 🚀 **Momentum** | MACD + Stoch bullish | MACD + Stoch bearish |
+| 3 | 📍 **Volatility** | Price in lower BB zone | Price in upper BB zone |
+| 4 | 🏗️ **Structure** | Above swing low | Below swing high |
+| 5 | ✅ **Price Action** | Higher close | Lower close |
+
+**Minimum required: 3/5 confluence pillars**
+
+### Parameters om te optimaliseren:
+- `sma_fast_period`: 10-30
+- `sma_slow_period`: 40-80
+- `macd_fast/slow/signal`: 8-15, 20-30, 7-12
+- `stoch_k/d_period`: 10-20, 3-5
+- `bb_period/std_dev`: 15-25, 1.5-2.5
+- `min_confluence`: 2-4
+
+### Regime Detection:
+De strategie past zich aan op marktcondities:
+- **Trend Mode**: Normale confluence vereist (3/5)
+- **Range Mode**: Hogere confluence vereist (4/5) + extremen
+
+---
+
+## 📊 Workflow
+
+### Stap 1: Optimalisatie (TPE)
+```bash
+python optimizer.py --trials 100
+```
+
+Dit vindt de beste parameters door duizenden combinaties te testen.
+
+**Output:**
+- `optimization_output/best_params.json` - Beste parameters
+- `optimization_output/optimization_history.csv` - Alle trials
+- `optimization_output/optimization_results.json` - Samenvatting
+
+### Stap 2: H1 Validatie
+```bash
+python simulator.py --params optimization_output/best_params.json
+```
+
+Simuleert trades op uurlijkse data voor realistische resultaten.
+
+**Output:**
+- `simulation_output/simulation_results.json` - Eindresultaten
+- `simulation_output/trades.csv` - Alle trades
+- `simulation_output/daily_snapshots.csv` - Dagelijkse balans
+
+### Stap 3: Live Trading
+```bash
+python live_bot.py
+```
+
+Draait de bot live met MetaTrader 5 (alleen op Windows).
+
+---
+
+## 💰 5ERS Prop Firm Regels
+
+De bot implementeert **strikte prop firm regels** om challenges te beschermen:
+
+| Regel | Limiet | Actie |
+|-------|--------|-------|
+| Daily DD Warning | 2.0% | ⚠️ Alert |
+| Daily DD Reduce | **3.2%** | **TRADE HALF** (50% position size) |
+| Daily DD Halt | 4.0% | ⛔ Stop trading voor vandaag |
+| Daily DD Limit | **5.0%** | 🚨 HARD LIMIT - Challenge failed |
+| Total DD Warning | 5.0% | ⚠️ Alert |
+| Total DD Reduce | 7.0% | Reduce to minimum risk |
+| Total DD Limit | **10.0%** | 🚨 HARD LIMIT - Challenge failed |
+
+### Kritieke Regels:
+
+1. **TRADE HALF @ 3.2%**: Wanneer daily DD 3.2% bereikt, worden alle nieuwe trades met 50% positiegrootte geplaatst
+2. **HALT @ 4%**: Geen nieuwe trades meer voor die dag
+3. **Total DD is STATIC**: Berekend vanaf startbalans ($100K), niet trailing!
+
+### Risk Management Flow:
+```
+0% DD → Normale risk (100%)
+   ↓
+2% DD → Warning (75% risk)
+   ↓  
+3.2% DD → TRADE HALF (50% risk)
+   ↓
+4% DD → HALT (0% - stop trading today)
+   ↓
+5% DD → CHALLENGE FAILED
+```
+
+---
+
+## 🔧 Strategie Aanpassen
+
+### 1. Open `strategy_template.py`
+
+### 2. Pas `generate_signal()` aan:
+```python
+def generate_signal(symbol, candles, params, signal_time=None):
+    # Jouw eigen logica hier
+    # Voorbeeld: voeg MACD toe, support/resistance, etc.
+    
+    # Return Signal object of None
+    return Signal(
+        symbol=symbol,
+        direction='bullish',  # of 'bearish'
+        entry=entry_price,
+        stop_loss=sl_price,
+        tp1=tp1_price,
+        tp2=tp2_price,
+        tp3=tp3_price,
+        confluence=score,
+        signal_time=signal_time
+    )
+```
+
+### 3. Voeg parameters toe aan `StrategyParams`:
+```python
+@dataclass
+class StrategyParams:
+    # Bestaande params...
+    
+    # Jouw nieuwe params:
+    macd_fast: int = 12
+    macd_slow: int = 26
+    macd_signal: int = 9
+```
+
+### 4. Update `optimizer.py` suggest_params():
+```python
+def suggest_params(trial):
+    return StrategyParams(
+        # Bestaande...
+        macd_fast=trial.suggest_int('macd_fast', 8, 15),
+        macd_slow=trial.suggest_int('macd_slow', 20, 30),
+        macd_signal=trial.suggest_int('macd_signal', 5, 12),
+    )
+```
+
+---
+
+## 📈 Performance & 5ERS Compliance
+
+De meegeleverde EMA(20,50) strategie is een **template** - je moet zelf betere parameters vinden!
+
+### Belangrijke Note:
+De optimizer stopt automatisch bij DD overschrijding:
+- Trading wordt geHALT bij 4% daily DD
+- Challenge wordt gestopt bij 5% daily of 10% total DD
+
+### Om 5ERS te passeren:
+1. Optimaliseer met conservatieve risk (0.3-0.5%)
+2. Valideer met H1 simulator
+3. Check dat Max Daily DD **onder 5%** blijft
+4. Check dat Max Total DD **onder 10%** blijft (static)
+
+> 💡 **Tip**: De "trade half at 3.2%" regel beschermt je account.
+> Als je vaak geHALT wordt, verlaag je base risk.
+
+---
+
+## ⚠️ Belangrijke Waarschuwingen
+
+1. **Backtests ≠ Live resultaten** - Altijd forward testen!
+2. **Geen financieel advies** - Alleen voor educatieve doeleinden
+3. **Risico management** - Gebruik altijd stop losses
+4. **Overfitting** - Pas op voor te veel parameters
+
+---
+
+## 🛠️ Vereisten
+
+- Python 3.10+
+- Optuna
+- Pandas
+- NumPy
+- tqdm
+- MetaTrader 5 (alleen voor live trading)
 
 ```bash
-# Run full live bot simulation (RECOMMENDED)
-python scripts/simulate_main_live_bot.py
-
-# Run signal validation (TPE backtest)
-python ftmo_challenge_analyzer.py --validate --start 2023-01-01 --end 2025-12-31
-
-# Run optimization
-python ftmo_challenge_analyzer.py --single --trials 100  # TPE single-objective
-python ftmo_challenge_analyzer.py --multi --trials 100   # NSGA-II multi-objective
-
-# Check optimization status
-python ftmo_challenge_analyzer.py --status
-
-# Run live bot (Windows VM with MT5)
-python main_live_bot.py
+pip install optuna pandas numpy tqdm
 ```
 
 ---
 
-## Architecture
+## 📝 Commands Overzicht
 
-### Two-Environment Design
-```
-┌─────────────────────────────────┐     ┌────────────────────────────────┐
-│   OPTIMIZER (Any Platform)      │     │  LIVE BOT (Windows VM + MT5)   │
-│                                  │     │                                 │
-│  ftmo_challenge_analyzer.py      │────▶│  main_live_bot.py              │
-│  - Optuna TPE / NSGA-II          │     │  - Loads params/current*.json  │
-│  - Backtesting 2003-2025         │     │  - Entry queue system          │
-│  - Parameter optimization        │     │  - 3-TP partial close          │
-│                                  │     │  - Dynamic lot sizing          │
-│  Output: params/current_params   │     │  - DDD/TDD safety              │
-└─────────────────────────────────┘     └────────────────────────────────┘
-```
+```bash
+# Optimalisatie
+python optimizer.py --trials 100 --balance 100000
 
-### Data Flow
-```
-params/current_params.json       ← Optimized strategy parameters
-         ↑                            ↓
-ftmo_challenge_analyzer.py      main_live_bot.py
-(Optuna optimization)           (loads params at startup)
-         ↑                            ↓
-data/ohlcv/                      scripts/simulate_main_live_bot.py
-(historical D1/H1 data)          (H1 realistic simulation)
+# Status bekijken
+python optimizer.py --status
+
+# H1 Simulatie
+python simulator.py --params optimization_output/best_params.json
+
+# Met custom instellingen
+python simulator.py --balance 100000 --start 2023-01-01 --end 2025-12-31
 ```
 
 ---
 
-## Project Structure
+## 🤝 Bijdragen
 
-```
-├── strategy_core.py              # Core trading logic (3-TP system)
-├── ftmo_challenge_analyzer.py    # Optimization engine & validation
-├── main_live_bot.py              # Live MT5 trading entry point
-├── broker_config.py              # Multi-broker configuration
-├── symbol_mapping.py             # Symbol conversion (OANDA ↔ broker)
-├── config.py                     # Contract specs, symbols
-├── ftmo_config.py                # 5ers challenge rules
-│
-├── params/                       # Parameter management
-│   ├── current_params.json       # Active parameters
-│   ├── defaults.py               # Default parameter values
-│   └── params_loader.py          # Load/save utilities
-│
-├── scripts/
-│   └── simulate_main_live_bot.py # H1 realistic simulation (matches live bot)
-│
-├── data/ohlcv/                   # Historical data (D1, H1)
-├── ftmo_analysis_output/         # Optimization & validation results
-│   ├── FINAL_SIMULATION_JAN06_2026/  # Definitive results
-│   ├── VALIDATE/                 # TPE validation results
-│   └── NSGA/                     # Multi-objective results
-│
-└── docs/                         # Documentation
-```
+Voel je vrij om:
+- Je eigen strategie te ontwikkelen
+- Bugs te rapporteren
+- Verbeteringen voor te stellen
 
 ---
 
-## 3-TP Exit System
+## 📜 Licentie
 
-The strategy uses 3 Take Profit levels with partial position closing:
-
-| Level | R-Multiple | Close % | SL Action |
-|-------|------------|---------|-----------|
-| TP1 | 0.6R | 35% | Move to breakeven |
-| TP2 | 1.2R | 30% | Trail to TP1+0.5R |
-| TP3 | 2.0R | 35% | Close remaining |
-
-**Trailing Stop**: Activated after TP1, moves to breakeven, then follows price.
+MIT License - Gebruik op eigen risico.
 
 ---
 
-## 5ers Challenge Rules
-
-| Rule | Limit | Our Performance |
-|------|-------|-----------------|
-| Max Total Drawdown | 10% below start ($54K stop-out) | **2.17% ✅** |
-| Max Daily Drawdown | 5% from day start | **4.16% ✅** |
-| Step 1 Target | 8% = $4,800 | **+1,481% ✅** |
-| Step 2 Target | 5% = $3,000 | **Achieved ✅** |
-| Min Profitable Days | 3 | **943 trades ✅** |
-
----
-
-## Key Files Reference
-
-| File | Purpose |
-|------|---------|
-| `strategy_core.py` | Trading strategy logic - 3-TP system, signals |
-| `params/current_params.json` | Current optimized parameters |
-| `ftmo_challenge_analyzer.py` | Optimization & validation engine |
-| `scripts/simulate_main_live_bot.py` | H1 realistic simulation |
-| `main_live_bot.py` | Live MT5 trading bot |
-| `challenge_risk_manager.py` | DDD/TDD enforcement |
-
----
-
-## Documentation
-
-- **[docs/5ERS_COMPLIANCE.md](docs/5ERS_COMPLIANCE.md)** - 5ers rule compliance
-- **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** - System architecture
-- **[docs/STRATEGY_GUIDE.md](docs/STRATEGY_GUIDE.md)** - Trading strategy details
-- **[docs/EXIT_STRATEGY.md](docs/EXIT_STRATEGY.md)** - 3-TP exit system
-- **[docs/CHANGELOG.md](docs/CHANGELOG.md)** - Version history
-- **[.github/copilot-instructions.md](.github/copilot-instructions.md)** - AI assistant guide
-
----
-
-## Final Simulation Results (January 6, 2026)
-
-### Full Live Bot Simulation (2023-2025)
-```json
-{
-  "starting_balance": 60000,
-  "final_balance": 948629,
-  "net_return_pct": 1481,
-  "total_trades": 943,
-  "win_rate": 66.1,
-  "max_total_dd_pct": 2.17,
-  "max_daily_dd_pct": 4.16,
-  "ddd_halt_events": 2,
-  "total_commissions": 9391
-}
-```
-
-**Results Location**: `ftmo_analysis_output/FINAL_SIMULATION_JAN06_2026/`
-
----
-
-**Last Updated**: January 4, 2026
+**Happy Trading! 🚀**
